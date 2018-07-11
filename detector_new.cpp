@@ -38,11 +38,12 @@ volatile int E_right = 0;
 void
 configure_pins()
 {
-	DETECTOR_DIR |= (_BV(COM_DETECTOR_OUTPUT_LEFT) | _BV(COM_DETECTOR_OUTPUT_RIGHT)); //0 - НАСТРОЙКА ПИНА НА ЗАПИСЬ
-	DETECTOR_DIR &= ~_BV(COM_DETECTOR_INPUT); //1 - НАСТРОЙКА ПИНА НА ЧТЕНИЕ
+	DETECTOR_DIR |= (_BV(COM_DETECTOR_OUTPUT_LEFT) | _BV(COM_DETECTOR_OUTPUT_RIGHT)); //0 - настройка ноги на запись в неё
+	DETECTOR_DIR &= ~_BV(COM_DETECTOR_INPUT); //1 - настройка ноги на чтение
 
-	DETECTOR_PORT &= ~(_BV(COM_DETECTOR_OUTPUT_LEFT) | _BV(COM_DETECTOR_OUTPUT_RIGHT)); //ЗАПИСЫВАЕМ В ПОРТ НУЛИ
-	//DETECTOR_PIN &= ~(_BV(COM_DETECTOR_INPUT)); //ЗАПИЫВАЕМ В ПИН НОЛЬ
+	DETECTOR_PORT &= ~(_BV(COM_DETECTOR_OUTPUT_LEFT) | _BV(COM_DETECTOR_OUTPUT_RIGHT)); //Выключаем ноги детекторов
+	DETECTOR_PIN &= ~(_BV(COM_DETECTOR_INPUT)); //Выключаем ногу, которая отвечает за передачу данных с дальномера
+
 	ENGINE_DIR |= _BV(ENGINE_LEFT) | _BV(ENGINE_RIGHT);
 	ENGINE_PORT &= ~(_BV(ENGINE_LEFT) | _BV(ENGINE_RIGHT));
 }
@@ -64,20 +65,6 @@ ISR(INT1_vect)
 	speed_cnt_right++;
 }
 
-/*bool
-counter(uint8_t target)
-{
-	if (cnt0 > target)
-	{
-		cnt0 = 0;
-		return true;
-	}
-
-	cnt0++;
-
-	return false;
-}*/
-
 bool
 delay_counter(uint8_t target)
 {
@@ -88,6 +75,21 @@ delay_counter(uint8_t target)
 		}
 
 		cnt0++;
+
+		return false;
+}
+
+//Счетчик, через который мы определяем настало ли время сбрасывать счетчик прерываний от внешнего воздействия
+bool
+counter_regulate_speed(uint8_t target)
+{
+		if (cnt1 > target)
+		{
+			cnt1 = 0;
+			return true;
+		}
+
+		cnt1++;
 
 		return false;
 }
@@ -119,9 +121,6 @@ get_direction() {
 		pwm_left = 10;
 		pwm_right = 10;
 
-		right_ob = false;
-		left_ob = false;
-
 		cmd = 1;
 		break;
 
@@ -136,7 +135,8 @@ get_direction() {
 			if (DETECTOR_PIN & _BV(COM_DETECTOR_INPUT)) c++;
 		}
 
-		if(c > 7) right_ob = true;
+		if(c > 7) left_ob = true;
+		else  left_ob = false;
 
 		cmd = 3;
 		break;
@@ -161,7 +161,8 @@ get_direction() {
 			if (DETECTOR_PIN & _BV(COM_DETECTOR_INPUT)) c++;
 		}
 
-		if(c > 7) left_ob = true;
+		if(c > 7) right_ob = true;
+		else right_ob = false;
 
 		cmd = 7;
 
@@ -216,11 +217,14 @@ regulate_right() {
 ISR(TIMER0_OVF_vect)
 {
 //	get_direction();
+
+	if(counter_regulate_speed(121)) {
 	regulate_right();
 	regulate_left();
+	}
 
-	pwm_left = 10;
-	pwm_right = 10;
+	/*pwm_left = 0;
+	pwm_right = 0;*/
 
 	do_pwm_right();
 	do_pwm_left();
