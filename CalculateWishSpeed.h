@@ -23,7 +23,7 @@ configure_pins_detectors();
 #define COM_DETECTOR_OUTPUT_RIGHT PB1
 //==========================================
 
-#define desired_speed 0.5
+#define desired_speed 2
 #define desired_speed_pwm desired_speed/(0.026)
 
 extern volatile uint8_t desired_speed_left;
