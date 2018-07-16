@@ -17,6 +17,8 @@ volatile uint8_t cnt0 = 0;//
 volatile uint8_t desired_speed_left = (uint8_t) desired_speed_pwm;//
 volatile uint8_t desired_speed_right = (uint8_t) desired_speed_pwm;//
 
+volatile uint8_t cmd_desired_speed = 0b00000000;
+
 void
 configure_pins_detectors()
 {
@@ -64,8 +66,7 @@ get_direction() {
 			if (DETECTOR_PIN & _BV(COM_DETECTOR_INPUT)) c++;
 		}
 
-		if(c > 7) left_ob = true;
-		else  left_ob = false;
+		if(c > 7) cmd_desired_speed |= _BV(7);
 
 		cmd = 3;
 		break;
@@ -90,8 +91,7 @@ get_direction() {
 			if (DETECTOR_PIN & _BV(COM_DETECTOR_INPUT)) c++;
 		}
 
-		if(c > 7) right_ob = true;
-		else right_ob = false;
+		if(c > 7) cmd_desired_speed |= _BV(6);
 
 		cmd = 7;
 
@@ -103,26 +103,30 @@ get_direction() {
 		break;
 
 	case 8:
-		if(!left_ob && !right_ob/*Наличие препятствия(false - нету препятствия)*/)
+		switch(cmd_desired_speed)
 		{
+		case 0b00000000:
 			desired_speed_left = desired_speed_pwm;
 			desired_speed_right = desired_speed_pwm;
-		}
-		else if(right_ob && left_ob)
-		{
-			desired_speed_left = 0;
-			desired_speed_right = 0;
-		}
-		else if (!right_ob && left_ob)
-		{
-			desired_speed_left = 0;
-			desired_speed_right = desired_speed_pwm;
-		}
-		else if (right_ob && !left_ob)
-		{
+			break;
+
+		case 0b10000000:
 			desired_speed_left = desired_speed_pwm;
 			desired_speed_right = 0;
+			break;
+
+		case 0b01000000:
+			desired_speed_left = 0;
+			desired_speed_right = desired_speed_pwm;
+			break;
+
+		case 0b11000000:
+			desired_speed_left = 0;
+			desired_speed_right = 0;
+			break;
 		}
+
+		cmd_desired_speed = 0b00000000;
 		cmd = 0;
 		break;
 	}
