@@ -21,14 +21,14 @@ bool
 pwm_counter_left(uint8_t target, uint8_t max = 10)
 {
 	if (cnt1 > max) cnt1 = 0;
-	return cnt1++ > target;
+	return cnt1++ >= target;
 }
 
 bool
 pwm_counter_right(uint8_t target, uint8_t max = 10)
 {
 	if (cnt2 > max) cnt2 = 0;
-	return cnt2++ > target;
+	return cnt2++ >= target;
 }
 
 

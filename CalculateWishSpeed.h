@@ -23,8 +23,8 @@ configure_pins_detectors();
 #define COM_DETECTOR_OUTPUT_RIGHT PB1
 //==========================================
 
-#define desired_speed 2
-#define desired_speed_pwm desired_speed/(0.026)
+#define desired_speed 0.2
+#define desired_speed_pwm ((uint8_t)(desired_speed/0.104)) //Прерывания в 1/4 секунды
 
 extern volatile uint8_t desired_speed_left;
 extern volatile uint8_t desired_speed_right;

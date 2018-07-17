@@ -6,16 +6,15 @@
 #include <stdint.h>
 
 
-#define desired_speed 0.5 //1 метр в секунду - максимальная скорость
-#define desired_speed_pwm desired_speed/(0.026)//
 
 volatile uint8_t cmd = 0;//
 volatile bool left_ob = 1;//
 volatile bool right_ob = 1;//
 volatile uint8_t cnt0 = 0;//
+volatile uint8_t c;
 
-volatile uint8_t desired_speed_left = (uint8_t) desired_speed_pwm;//
-volatile uint8_t desired_speed_right = (uint8_t) desired_speed_pwm;//
+volatile uint8_t desired_speed_left = 1;//
+volatile uint8_t desired_speed_right = 1;//
 
 volatile uint8_t cmd_desired_speed = 0b00000000;
 
@@ -46,8 +45,6 @@ delay_counter(uint8_t target)
 //Главная функция, которая определяет, какой должна быть скорость
 void
 get_direction() {
-	uint8_t c;
-
 	switch(cmd) {
 	case 0: //Включение питания левого датчика
 		DETECTOR_PORT |= _BV(COM_DETECTOR_OUTPUT_LEFT);
@@ -105,22 +102,22 @@ get_direction() {
 	case 8:
 		switch(cmd_desired_speed)
 		{
-		case 0b00000000:
+		case 0b11000000:
 			desired_speed_left = desired_speed_pwm;
 			desired_speed_right = desired_speed_pwm;
 			break;
 
-		case 0b10000000:
+		case 0b01000000:
 			desired_speed_left = desired_speed_pwm;
-			desired_speed_right = 0;
+			STOP_RIGHT;
 			break;
 
-		case 0b01000000:
+		case 0b10000000:
 			desired_speed_left = 0;
 			desired_speed_right = desired_speed_pwm;
 			break;
 
-		case 0b11000000:
+		case 0b00000000:
 			desired_speed_left = 0;
 			desired_speed_right = 0;
 			break;
