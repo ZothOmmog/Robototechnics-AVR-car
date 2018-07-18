@@ -1,5 +1,5 @@
-#ifndef CALCULATEWISHSPEED_H_
-#define CALCULATEWISHSPEED_H_
+#ifndef GETDIRECTION_H_
+#define GETDIRECTION_H_
 
 #include <stdint.h>
 
@@ -23,10 +23,17 @@ configure_pins_detectors();
 #define COM_DETECTOR_OUTPUT_RIGHT PB1
 //==========================================
 
+#define OBS_LEFT 0b01000000
+#define OBS_RIGHT 0b10000000
+#define OBS_FRONT 0b00000000
+#define NOT_OBS 0b11000000
+
+/*
 #define desired_speed 0.2
 #define desired_speed_pwm ((uint8_t)(desired_speed/0.104)) //Прерывания в 1/4 секунды
+*/
 
 extern volatile uint8_t desired_speed_left;
 extern volatile uint8_t desired_speed_right;
 
-#endif /* CALCULATEWISHSPEED_H_ */
+#endif /* GETDIRECTION_H_ */

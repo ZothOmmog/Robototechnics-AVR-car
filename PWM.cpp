@@ -2,9 +2,9 @@
 #include <avr/iom16.h>
 #include <avr/sfr_defs.h>
 #include <stdint.h>
-//#include "header.h"
-#include "PWM.h"
-#include "adjust_speed.h"
+
+#include "Pwm.h"
+#include "RegulateSpeed.h"
 
 volatile uint8_t cnt1 = 0;
 volatile uint8_t cnt2 = 0;

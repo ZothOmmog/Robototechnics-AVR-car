@@ -1,9 +1,10 @@
 #include <avr/interrupt.h>
 #include <stdint.h>
 
-#include "CalculateWishSpeed.h"
+#include "GetDirection.h"
+#include "Pwm.h"
 
-//Макросы, которые используются в ПИД-регуляторе для преобразования входной скорости в значения, которые использует ШИМ
+//макросы, которые используются в ПИД-регуляторе для преобразования входной скорости в значения, которые использует ШИМ
 #define _MIN(x,y) ((x < y) ? x : y)
 #define _MAX(x,y) ((x > y) ? x : y)
 
@@ -76,18 +77,22 @@ regulate_left()
 {
 	if(regulate_left_counter(dt))
 	{
-		spd_left = speed_cnt_left; //Кол-во прерываний за время dt
-		speed_cnt_left = 0;
+		if(desired_speed_left == 0) pwm_left = 0;
+		else
+		{
+			spd_left = speed_cnt_left; //Кол-во прерываний за время dt
+			speed_cnt_left = 0;
 
-		e = desired_speed_left - spd_left; //Пропорциональная составляющая ошибка
+			e = desired_speed_left - spd_left; //Пропорциональная составляющая ошибка
 
-		Ie_l += e; //Интегральная составляющая ошибки
+			Ie_l += e; //Интегральная составляющая ошибки
 
-		de = e - e0_l; //Дифференциальная составляющая ошибка
-		e0_l = e; //
+			de = e - e0_l; //Дифференциальная составляющая ошибка
+			e0_l = e;
 
-		pwm_left = _MIN(_MAX(Kp * e + Ki * Ie_l + Kd * de, 0), 20); //Величина-посредник для регулирования скорости (ШИМ)
-		//pwm_left = 5;
+			pwm_left = _MIN(_MAX(Kp * e + Ki * Ie_l + Kd * de, 0), 20); //Величина-посредник для регулирования скорости (ШИМ)
+			//pwm_left = 5;
+		}
 	}
 }
 
@@ -97,17 +102,21 @@ regulate_right()
 {
 	if(regulate_right_counter(dt))
 	{
-		spd_right = speed_cnt_right;
-		speed_cnt_right = 0;
+		if(desired_speed_right == 0) pwm_right = 0;
+		else
+		{
+			spd_right = speed_cnt_right;
+			speed_cnt_right = 0;
 
-		e = desired_speed_right - spd_right;
+			e = desired_speed_right - spd_right;
 
-		Ie_r += e;
+			Ie_r += e;
 
-		de = e - e0_r; //Дифференциальная составляющая ошибка
-		e0_r = e; //
+			de = e - e0_r; //Дифференциальная составляющая ошибка
+			e0_r = e; //
 
-		pwm_right = _MIN(_MAX(Kp * e + Ki * Ie_r + Kd * de, 0), 20);
-		//pwm_right = 5;
+			pwm_right = _MIN(_MAX(Kp * e + Ki * Ie_r + Kd * de, 0), 20);
+			//pwm_right = 5;
+		}
 	}
 }

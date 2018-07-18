@@ -1,11 +1,10 @@
-#include "CalculateWishSpeed.h"
-
 #include <avr/interrupt.h>
 #include <avr/iom16.h>
 #include <avr/sfr_defs.h>
 #include <stdint.h>
 
-
+#include "Pwm.h"
+#include "GetDirection.h"
 
 volatile uint8_t cmd = 0;//
 volatile bool left_ob = 1;//
@@ -13,8 +12,11 @@ volatile bool right_ob = 1;//
 volatile uint8_t cnt0 = 0;//
 volatile uint8_t c;
 
-volatile uint8_t desired_speed_left = 1;//
-volatile uint8_t desired_speed_right = 1;//
+volatile uint8_t desired_speed_left = 2;//
+volatile uint8_t desired_speed_right = 2;//
+
+volatile uint8_t saved_desired_speed_left = desired_speed_left;
+volatile uint8_t saved_desired_speed_right = desired_speed_right;
 
 volatile uint8_t cmd_desired_speed = 0b00000000;
 
@@ -59,11 +61,12 @@ get_direction() {
 	case 2: //Считывание данных из левого датчика
 		c = 0;
 
-		for (int i = 0; i < 10; i++) {
-			if (DETECTOR_PIN & _BV(COM_DETECTOR_INPUT)) c++;
+		for (int i = 0; i < 10; i++)
+		{
+			if (DETECTOR_PIN & _BV(COM_DETECTOR_INPUT)) c++; // 1 - нет припятствия, 0 - есть припятствие
 		}
 
-		if(c > 7) cmd_desired_speed |= _BV(7);
+		if(c < 7) cmd_desired_speed |= OBS_LEFT;
 
 		cmd = 3;
 		break;
@@ -84,11 +87,13 @@ get_direction() {
 
 	case 6: //Считывание данных из правого датчика
 		c = 0;
-		for (int i = 0; i < 10; ++i) {
+
+		for (int i = 0; i < 10; ++i)
+		{
 			if (DETECTOR_PIN & _BV(COM_DETECTOR_INPUT)) c++;
 		}
 
-		if(c > 7) cmd_desired_speed |= _BV(6);
+		if(c < 7) cmd_desired_speed |= OBS_RIGHT;
 
 		cmd = 7;
 
@@ -102,28 +107,29 @@ get_direction() {
 	case 8:
 		switch(cmd_desired_speed)
 		{
-		case 0b11000000:
-			desired_speed_left = desired_speed_pwm;
-			desired_speed_right = desired_speed_pwm;
+		case NOT_OBS:
+			desired_speed_left = saved_desired_speed_left;
+			desired_speed_right = saved_desired_speed_right;
 			break;
 
-		case 0b01000000:
-			desired_speed_left = desired_speed_pwm;
-			STOP_RIGHT;
-			break;
-
-		case 0b10000000:
-			desired_speed_left = 0;
-			desired_speed_right = desired_speed_pwm;
-			break;
-
-		case 0b00000000:
-			desired_speed_left = 0;
+		case OBS_LEFT:
+			desired_speed_left = saved_desired_speed_left;
 			desired_speed_right = 0;
+
+			break;
+
+		case OBS_RIGHT:
+			desired_speed_left = 0;
+			desired_speed_right = saved_desired_speed_right;
+			break;
+
+		case OBS_FRONT:
+			desired_speed_left = 0;
+			desired_speed_left = 0;
 			break;
 		}
 
-		cmd_desired_speed = 0b00000000;
+		cmd_desired_speed = 0;
 		cmd = 0;
 		break;
 	}
