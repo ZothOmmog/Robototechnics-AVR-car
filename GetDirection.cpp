@@ -18,7 +18,7 @@ volatile uint8_t desired_speed_right = 2;//
 volatile uint8_t saved_desired_speed_left = desired_speed_left;
 volatile uint8_t saved_desired_speed_right = desired_speed_right;
 
-volatile uint8_t cmd_desired_speed = 0b00000000;
+volatile uint8_t cmd_desired_speed = NOT_OBS;
 
 void
 configure_pins_detectors()
@@ -66,7 +66,7 @@ get_direction() {
 			if (DETECTOR_PIN & _BV(COM_DETECTOR_INPUT)) c++; // 1 - нет припятствия, 0 - есть припятствие
 		}
 
-		if(c < 7) cmd_desired_speed |= OBS_LEFT;
+		if(c < 7) cmd_desired_speed &= OBS_LEFT;
 
 		cmd = 3;
 		break;
@@ -93,7 +93,7 @@ get_direction() {
 			if (DETECTOR_PIN & _BV(COM_DETECTOR_INPUT)) c++;
 		}
 
-		if(c < 7) cmd_desired_speed |= OBS_RIGHT;
+		if(c < 7) cmd_desired_speed &= OBS_RIGHT;
 
 		cmd = 7;
 
@@ -129,7 +129,7 @@ get_direction() {
 			break;
 		}
 
-		cmd_desired_speed = 0;
+		cmd_desired_speed = NOT_OBS;
 		cmd = 0;
 		break;
 	}

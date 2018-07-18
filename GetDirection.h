@@ -23,10 +23,10 @@ configure_pins_detectors();
 #define COM_DETECTOR_OUTPUT_RIGHT PB1
 //==========================================
 
-#define OBS_LEFT 0b01000000
-#define OBS_RIGHT 0b10000000
-#define OBS_FRONT 0b00000000
-#define NOT_OBS 0b11000000
+#define OBS_LEFT	0b01000000
+#define OBS_RIGHT 	0b10000000
+#define OBS_FRONT 	0b00000000
+#define NOT_OBS 	0b11000000
 
 /*
 #define desired_speed 0.2
