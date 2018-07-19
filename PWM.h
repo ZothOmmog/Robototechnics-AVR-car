@@ -15,8 +15,8 @@ configure_pins_engines();
 
 #define ENGINE_PORT PORTD
 
-#define ENGINE_LEFT PD7
-#define ENGINE_RIGHT PD5
+#define ENGINE_LEFT PD5
+#define ENGINE_RIGHT PD7
 
 //Запуск двигателей
 #define PUSK_LEFT ENGINE_PORT |= _BV(ENGINE_LEFT)

@@ -125,7 +125,7 @@ get_direction() {
 
 		case OBS_FRONT:
 			desired_speed_left = 0;
-			desired_speed_left = 0;
+			desired_speed_right = 0;
 			break;
 		}
 

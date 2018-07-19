@@ -18,12 +18,13 @@ configure_timer()
 //Прерывание от таймера
 ISR(TIMER0_OVF_vect)
 {
-	get_direction();
-
-	regulate_right();
-	regulate_left();
-
-	do_pwm_right();
+//	get_direction();
+//
+//	regulate_right();
+//	regulate_left();
+//
+//	do_pwm_right();
+	pwm_right = 15;
 	do_pwm_left();
 }
 
