@@ -12,8 +12,8 @@ volatile bool right_ob = 1;//
 volatile uint8_t cnt0 = 0;//
 volatile uint8_t c;
 
-volatile uint8_t desired_speed_left = 2;//
-volatile uint8_t desired_speed_right = 2;//
+volatile uint8_t desired_speed_left = 5;//
+volatile uint8_t desired_speed_right = 5;//
 
 volatile uint8_t saved_desired_speed_left = desired_speed_left;
 volatile uint8_t saved_desired_speed_right = desired_speed_right;
